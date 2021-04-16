@@ -5,7 +5,7 @@ const { connect, leave } = require('../modules/function');
 
 module.exports = {
     name: 'leave',
-    aliases: ['나가','꺼져','저리가'],
+    aliases: ['나가','꺼져','저리가','종료'],
     async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;

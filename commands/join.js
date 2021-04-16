@@ -5,7 +5,7 @@ const { connect } = require('../modules/function');
 
 module.exports = {
     name: 'join',
-    aliases: [],
+    aliases: ['접속','빅스비'],
     async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;

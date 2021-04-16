@@ -4,5 +4,6 @@
     "text_channel": "832448996646584360",
     "prefix": "!!",
     "voice_prefix": "빅스비",
+    "voice_prefix_say": ["빅스비 야", "익스피디아"],
     "msg_time": 5000
 }

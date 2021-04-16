@@ -6,8 +6,8 @@ const { tts_play } = require('../modules/tts');
 const { randm } = require('../modules/math');
 
 module.exports = {
-    name: '자폭해',
-    aliases: ['작곡해'],
+    name: 'boom',
+    aliases: ['자폭해','작곡해'],
     async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
@@ -32,7 +32,7 @@ module.exports = {
                 try {
                     channel.leave();
                 } catch(err) {}
-            }, 7100);
+            }, 7200);
         }, 2600);
     },
 };

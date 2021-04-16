@@ -4,7 +4,7 @@ module.exports = {
     tts_play,
 };
 
-function tts_msg (text) {
+function tts_msg (text = '') {
     text = text.replace(/\?/gi, '물음표') || text;
     text = text.replace(/\!/gi, '느낌표') || text;
     text = text.replace(/\~/gi, '물결표') || text;
@@ -46,7 +46,7 @@ function tts_play(msg, guildMap, mapKey, text = '', opt = {
     }
     var channel;
     try {
-        channel = guildMap.get(mapKey).voice_Channel
+        channel = guildMap.get(mapKey).voice_Channel;
     } catch(err) {
         channel = msg.member.voice.channel;
     }

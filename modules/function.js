@@ -6,6 +6,8 @@ const path = require('path');
 const { Readable } = require('stream');
 const { tts_play } = require('../modules/tts');
 const { randm } = require('../modules/math');
+const { getFormatDate, getFormatTime } = require('../modules/date');
+const { say } = require('../modules/say');
 
 const config = require('../config.json');
 let WITAPIKEY = process.env.WITAPIKEY;
@@ -25,6 +27,33 @@ module.exports = {
     leave,
 };
 
+function logfile(text = '', user) {
+    fs.access(`./log`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+        if (err) {
+            fs.mkdir(`./log`, (err) => {
+                if (err) throw err;
+            });
+        } else {
+            var date = getFormatDate(new Date());
+            fs.access(`./log/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+                if (err) {
+                    fs.mkdir(`./log/${date}`, (err) => {
+                        if (err) throw err;
+                    });
+                } else {
+                    fs.open(`./log/${date}/${user.id}.txt`, 'a+', (err, fd) => {
+                        if (err) throw err;
+                        var time = getFormatTime(new Date());
+                        fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text}\n`, function (err) {
+                            if (err) throw err;
+                        });
+                    });
+                }
+            });
+        }
+    });
+}
+
 async function leave(guildMap, mapKey) {
     if (guildMap.has(mapKey)) {
         let val = guildMap.get(mapKey);
@@ -42,7 +71,7 @@ async function connect(client, msg, guildMap, mapKey) {
         let text_Channel = await client.channels.fetch(config.text_channel);
         if (!text_Channel) return msg.channel.send("텍스트채널을 볼수 없습니다.");
         let voice_Connection = await voice_Channel.join();
-        voice_Connection.play('sounds/sound.mp3', { volume: 0.8 });
+        tts_play(msg, guildMap, mapKey, `빅스비가 활성화 되었습니다. 빅스비 명령어로 명령어들을 확인하실수있습니다.`, {});
         guildMap.set(mapKey, {
             'text_Channel': text_Channel,
             'voice_Channel': voice_Channel,
@@ -80,16 +109,26 @@ function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
 
             try {
                 let new_buffer = await convert_audio(buffer);
-                let out = await transcribe(new_buffer);
-                if (out != null) process_commands_query(client, msg, guildMap, mapKey, out, user.id);
+                let out = await transcribe(new_buffer, user);
+                if (out != null) process_commands_query(client, msg, guildMap, mapKey, out, user);
             } catch (e) {
                 console.log('tmpraw rename: ' + e);
             }
         });
     });
 }
-async function process_commands_query(client, msg, guildMap, mapKey, text, userid) {
+async function process_commands_query(client, msg, guildMap, mapKey, text, user) {
     if (!text || !text.length) return;
+
+    const saycheck = text.trim().split(/ +/g);
+    if (config.voice_prefix_say.includes(saycheck[0])) {
+        const args = text.trim().slice(saycheck[0].length).trim().split(/ +/g);
+        return say(msg, guildMap, mapKey, args);
+    }
+    if (config.voice_prefix_say.includes(saycheck.slice(0,2).join(' '))) {
+        const args = text.trim().slice(saycheck.slice(0,2).join(' ').length).trim().split(/ +/g);
+        return say(msg, guildMap, mapKey, args);
+    }
 
     const regex = eval(`/^${config.voice_prefix} ([a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+)(.+?)?$/`);
     if (text.toLowerCase().match(regex)) {
@@ -102,29 +141,28 @@ async function process_commands_query(client, msg, guildMap, mapKey, text, useri
             const command = require(path.join(__dirname, '../commands', `${file}`));
             client.commands.set(command.name, command);
         }
-        const commandName = args.shift().toLowerCase();
+        const commandName = args[0].toLowerCase();
         const command = client.commands.get(commandName) ||
         client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
         try {
-            await command.run(client, msg, args, guildMap, mapKey);
+            return await command.run(client, msg, args.slice(1), guildMap, mapKey);
         } catch(err) {
             // 오류 확인console.log(err);
-            
             var text = {
                 1: '잘 못알아들었어요',
                 2: '저는 잘 모르겠어요',
                 3: '처음들어보는 말이예요',
             };
-            tts_play(guildMap, mapKey, text[randm(1, 3)], {});
+            return tts_play(msg, guildMap, mapKey, text[randm(1, 3)], {});
         }
     }
 }
 // SPEECH
-async function transcribe(buffer) {
-  return transcribe_witai(buffer);
+async function transcribe(buffer, user) {
+    return transcribe_witai(buffer, user);
 }
 
-async function transcribe_witai(buffer) {
+async function transcribe_witai(buffer, user) {
     try {
         const extractSpeechIntent = util.promisify(witClient.extractSpeechIntent);
         var stream = Readable.from(buffer);
@@ -133,17 +171,16 @@ async function transcribe_witai(buffer) {
         witAI_lastcallTS = Math.floor(new Date());
         stream.destroy();
         if (output && '_text' in output && output._text.length) {
-            console.log(output._text);
+            logfile(output._text, user);
             return output._text;
         }
         if (output && 'text' in output && output.text.length) {
-            console.log(output.text);
+            logfile(output.text, user);
             return output.text;
         }
         return output;
     } catch (e) {
-        console.log('transcribe_witai 851:' + e);
-        console.log(e);
+        return;
     }
 }
 async function convert_audio(input) {
