@@ -6,7 +6,7 @@ const html = require('./modules/html/html');
 // CONFIG
 const config = require('./config.json');
 const prefix = config.prefix;
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN || config.discord_token;
+const DISCORD_TOKEN = process.env.TOKEN || config.discord_token;
 // CONFIG END
 
 
