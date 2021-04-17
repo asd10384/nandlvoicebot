@@ -39,7 +39,7 @@ function logfile(client, text = '', user) {
     fs.access(`./log`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             fs.mkdir(`./log`, (err) => {
-                if (err) throw err;
+                if (err) {}
             });
         } else {
             var date = getFormatDate(new Date());
