@@ -1,21 +1,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const html = require('./modules/html/html');
 
 // CONFIG
 const config = require('./config.json');
 const prefix = config.prefix;
-
-let WITAPIKEY = process.env.WITAPIKEY;
-if (!WITAPIKEY) {
-    WITAPIKEY = config.wit_ai_token;
-    if (!WITAPIKEY) throw 'failed loading config #113 missing keys!';
-}
-let DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-if (!DISCORD_TOKEN) {
-    DISCORD_TOKEN = config.discord_token;
-    if (!DISCORD_TOKEN) throw 'failed loading config #113 missing keys!';
-}
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN || config.discord_token;
 // CONFIG END
 
 
@@ -41,13 +32,14 @@ client.on('ready', () => {
         },
         status: 'online'
     });
+    html.start();
 });
 client.login(DISCORD_TOKEN);
 
 client.on('message', async (msg) => {
     if (msg.author.bot) return;
     if (!('guild' in msg) || !msg.guild) return;
-
+    
     const mapKey = msg.guild.id;
     if (msg.content.trim().startsWith(prefix)) {
         const args = msg.content.slice(prefix.length).trim().split(/ +/g);
@@ -57,9 +49,9 @@ client.on('message', async (msg) => {
 
         try {
             msgdelete(msg, 300);
-            await command.run(client, msg, args, guildMap, mapKey);
+            await command.run(client, msg, args, guildMap, mapKey, msg.member.user);
         } catch(err) {
-            console.log(err);
+            // console.log(err);
             const embed = new Discord.MessageEmbed()
                 .setColor('DARK_RED')
                 .setDescription(`\` ${commandName} \` 이라는 명령어를 찾을수 없습니다.`)

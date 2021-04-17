@@ -1,12 +1,12 @@
 
 const { MessageEmbed, Message, Client } = require('discord.js');
 const config = require('../config.json');
-const { connect } = require('../modules/function');
+const { connect, setInter } = require('../modules/function');
 
 module.exports = {
     name: 'join',
     aliases: ['접속','빅스비'],
-    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
+    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id, user) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
         
@@ -19,6 +19,7 @@ module.exports = {
                     .then(m => msgdelete(m, config.msg_time));
             } else {
                 if (!guildMap.has(mapKey)) await connect(client, msg, guildMap, mapKey);
+                setInter(client, msg, guildMap, mapKey);
             }
         } catch(err) {
             client.channels.cache.get(config.voice_channel).join();

@@ -8,7 +8,7 @@ const { randm } = require('../modules/math');
 module.exports = {
     name: 'boom',
     aliases: ['자폭해','작곡해'],
-    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
+    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id, user) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
         

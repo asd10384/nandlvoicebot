@@ -8,7 +8,7 @@ const { randm } = require('../modules/math');
 module.exports = {
     name: 'hello',
     aliases: ['안녕','안뇽'],
-    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
+    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id, user) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
         
@@ -19,8 +19,8 @@ module.exports = {
         var text = {
             1: '안녕하세요.',
             2: '반가워요',
-            3: '안녕하세요.',
-            4: '반가워요',
+            3: '안녕하세요 저는 빅스비입니다.',
+            4: '만나서 반갑습니다',
             5: '안녕하세요.',
             6: '반가워요',
             7: '반갑습니다',

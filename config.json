@@ -2,8 +2,19 @@
     "discord_token": "testODMyMjUyMjQ1NDI4NjY2NDE4.YHhFTQ.q4lSBToPlC34fykzPX0LuBbC0LY",
     "wit_ai_token": "IBNYNDDH74FDOHQM3Z5YG2GDRUKRGPWZ",
     "text_channel": "832448996646584360",
+    "defult_voice_channel": "753602736318316584",
     "prefix": "!!",
     "voice_prefix": "빅스비",
     "voice_prefix_say": ["빅스비 야", "익스피디아"],
-    "msg_time": 5000
+    "msg_time": 5000,
+    "commandhelp": {
+        "도움말": "도움말 확인",
+        "안녕": "여러가지 인사로 받아줍니다.",
+        "핑": "핑 확인",
+        "비트박스": "북치기 박치기"
+    },
+    "role": [
+        "ADMINISTRATOR"
+    ],
+    "HTMLPORT": 3000
 }

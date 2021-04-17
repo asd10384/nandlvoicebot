@@ -7,9 +7,9 @@ module.exports = {
     say,
 };
 
-function say (msg, guildMap, mapKey, args = []) {
+function say(msg, guildMap, mapKey, args = []) {
     var saytext = '';
-    if (args.length == 0) {
+    if (args[0] == '') {
         var text = {
             1: '네 듣고있어요!',
             2: '왜 부르셨나요?',

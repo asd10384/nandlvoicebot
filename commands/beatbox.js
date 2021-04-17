@@ -2,24 +2,19 @@
 const { MessageEmbed, Message, Client } = require('discord.js');
 const config = require('../config.json');
 const { connect } = require('../modules/function');
+const { tts_play } = require('../modules/tts');
 
 module.exports = {
-    name: '',
-    aliases: [''],
+    name: 'beatbox',
+    aliases: ['비트박스','비트박스해줘'],
     async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id, user) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
         
         const per = new MessageEmbed()
             .setTitle(`이 명령어를 사용할 권한이 없습니다.`)
-            .setDescription(`명령어 : \` 빅스비 ${this.name} \`\n같은 명령어 : [${this.aliases}]`)
             .setColor('RED');
-
-        // 권한확인
-        const usermember = msg.guild.members.cache.get(user.id);
-        if (!usermember.permissions.has(config.role)) return user.send(per).then(m => msgdelete(m, config.msg_time + 5000));
         
-        // 음성채널 확인
         if (!msg.member.voice.channelID) {
             msg.channel.send('음성채널에 들어간 뒤 사용해주세요.')
                 .then(m => msgdelete(m, config.msg_time));
@@ -27,8 +22,15 @@ module.exports = {
             if (!guildMap.has(mapKey)) await connect(client, msg, guildMap, mapKey);
         }
 
-        // 명령어
-        
+        if (['해줘'].includes(args[0])) {
+            tts_play(msg, guildMap, mapKey, `듣고 놀라지 마세요`, {});
+            setTimeout(() => {
+                tts_play(msg, guildMap, mapKey, `북치기 박치기 북북 박치기`, {});
+                setTimeout(() => {
+                    tts_play(msg, guildMap, mapKey, `어떄요`, {});
+                }, 3250);
+            }, 2550);
+        }
     },
 };
 

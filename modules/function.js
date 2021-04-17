@@ -10,11 +10,7 @@ const { getFormatDate, getFormatTime } = require('../modules/date');
 const { say } = require('../modules/say');
 
 const config = require('../config.json');
-let WITAPIKEY = process.env.WITAPIKEY;
-if (!WITAPIKEY) {
-    WITAPIKEY = config.wit_ai_token;
-    if (!WITAPIKEY) throw 'failed loading config #113 missing keys!';
-}
+const WITAPIKEY = process.env.WITAPIKEY || config.wit_ai_token;
 
 const witClient = require('node-witai-speech');
 
@@ -25,9 +21,21 @@ module.exports = {
     transcribe,
     transcribe_witai,
     leave,
+    setInter,
 };
 
-function logfile(text = '', user) {
+function setInter(client, msg, guildMap, mapKey) {
+    const setIntertimer = setInterval(() => {
+        if (!msg.guild.me.voice.channel) {
+            client.channels.cache.get(config.defult_voice_channel);
+            tts_play(msg, guildMap, mapKey, `빅스비는 내보낼수 없습니다.`, {});
+            connect(client, msg, guildMap, mapKey, {
+                frist: false,
+            });
+        }
+    }, 1000);
+}
+function logfile(client, text = '', user) {
     fs.access(`./log`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             fs.mkdir(`./log`, (err) => {
@@ -44,8 +52,9 @@ function logfile(text = '', user) {
                     fs.open(`./log/${date}/${user.id}.txt`, 'a+', (err, fd) => {
                         if (err) throw err;
                         var time = getFormatTime(new Date());
-                        fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text}\n`, function (err) {
+                        fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
                             if (err) throw err;
+                            client.channels.cache.get(config.text_channel).send(`[${time}] ${user.username} : ${text}`);
                         });
                     });
                 }
@@ -64,14 +73,16 @@ async function leave(guildMap, mapKey) {
     }
 }
 
-async function connect(client, msg, guildMap, mapKey) {
+async function connect(client, msg, guildMap, mapKey, setting = {
+    frist: true
+}) {
     try {
         let voice_Channel = await client.channels.fetch(msg.member.voice.channelID);
         if (!voice_Channel) return msg.channel.send("음성채널에 들어갈수 없음");
         let text_Channel = await client.channels.fetch(config.text_channel);
         if (!text_Channel) return msg.channel.send("텍스트채널을 볼수 없습니다.");
         let voice_Connection = await voice_Channel.join();
-        tts_play(msg, guildMap, mapKey, `빅스비가 활성화 되었습니다. 빅스비 명령어로 명령어들을 확인하실수있습니다.`, {});
+        if (setting.frist) tts_play(msg, guildMap, mapKey, `빅스비가 활성화 되었습니다. 빅스비 명령어로 명령어들을 확인하실수있습니다.`, {});
         guildMap.set(mapKey, {
             'text_Channel': text_Channel,
             'voice_Channel': voice_Channel,
@@ -82,11 +93,7 @@ async function connect(client, msg, guildMap, mapKey) {
         voice_Connection.on('disconnect', async(e) => {
             guildMap.delete(mapKey);
         });
-    } catch (e) {
-        console.log('connect: ' + e);
-        msg.channel.send('음성채널에 들어갈수 없습니다.');
-        throw e;
-    }
+    } catch (e) {}
 }
 
 function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
@@ -94,9 +101,6 @@ function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
         if (speaking.bitfield == 0 || user.bot) return;
         // this creates a 16-bit signed PCM, stereo 48KHz stream
         const audioStream = voice_Connection.receiver.createStream(user, { mode: 'pcm' });
-        audioStream.on('error',  (e) => {
-            console.log('audioStream: ' + e);
-        });
         let buffer = [];
         audioStream.on('data', (data) => {
             buffer.push(data);
@@ -109,11 +113,9 @@ function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
 
             try {
                 let new_buffer = await convert_audio(buffer);
-                let out = await transcribe(new_buffer, user);
+                let out = await transcribe(client, new_buffer, user);
                 if (out != null) process_commands_query(client, msg, guildMap, mapKey, out, user);
-            } catch (e) {
-                console.log('tmpraw rename: ' + e);
-            }
+            } catch (e) {}
         });
     });
 }
@@ -145,9 +147,10 @@ async function process_commands_query(client, msg, guildMap, mapKey, text, user)
         const command = client.commands.get(commandName) ||
         client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
         try {
-            return await command.run(client, msg, args.slice(1), guildMap, mapKey);
+            await command.run(client, msg, args.slice(1), guildMap, mapKey, user);
         } catch(err) {
-            // 오류 확인console.log(err);
+            // 오류 확인
+            // console.log(err);
             var text = {
                 1: '잘 못알아들었어요',
                 2: '저는 잘 모르겠어요',
@@ -158,11 +161,11 @@ async function process_commands_query(client, msg, guildMap, mapKey, text, user)
     }
 }
 // SPEECH
-async function transcribe(buffer, user) {
-    return transcribe_witai(buffer, user);
+async function transcribe(client, buffer, user) {
+    return transcribe_witai(client, buffer, user);
 }
 
-async function transcribe_witai(buffer, user) {
+async function transcribe_witai(client, buffer, user) {
     try {
         const extractSpeechIntent = util.promisify(witClient.extractSpeechIntent);
         var stream = Readable.from(buffer);
@@ -171,17 +174,15 @@ async function transcribe_witai(buffer, user) {
         witAI_lastcallTS = Math.floor(new Date());
         stream.destroy();
         if (output && '_text' in output && output._text.length) {
-            logfile(output._text, user);
+            logfile(client, output._text, user);
             return output._text;
         }
         if (output && 'text' in output && output.text.length) {
-            logfile(output.text, user);
+            logfile(client, output.text, user);
             return output.text;
         }
         return output;
-    } catch (e) {
-        return;
-    }
+    } catch (e) {}
 }
 async function convert_audio(input) {
     try {
@@ -193,9 +194,5 @@ async function convert_audio(input) {
             ndata[j++] = data[i+1];
         }
         return Buffer.from(ndata);
-    } catch (e) {
-        console.log(e);
-        console.log('convert_audio: ' + e);
-        throw e;
-    }
+    } catch (e) {}
 }

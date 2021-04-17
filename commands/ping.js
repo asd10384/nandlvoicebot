@@ -6,7 +6,7 @@ const { connect } = require('../modules/function');
 module.exports = {
     name: 'ping',
     aliases: ['핑'],
-    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id) {
+    async run (client = new Client(), msg = new Message(), args = [], guildMap = new Map(), mapKey = new Message().guild.id, user) {
         const prefix = config.prefix;
         const voice_prefix = config.voice_prefix;
         
@@ -15,11 +15,11 @@ module.exports = {
             .setColor('RED');
         
         const embed = new MessageEmbed()
-        .setTitle(`\` PONG! \``)
-        .setDescription(`🏓 \` ${client.ws.ping} \` ms`)
-        .setColor('RANDOM');
+            .setTitle(`\` PONG! \``)
+            .setDescription(`🏓 \` ${client.ws.ping} \` ms`)
+            .setColor('RANDOM');
 
-        msg.channel.send(embed)
+        user.send(embed)
             .then(m => msgdelete(m, config.msg_time + 15000));
     },
 };
