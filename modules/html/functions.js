@@ -36,8 +36,7 @@ function logpage(now = './log', name = '') {
             text.replace(/\\n/g, '<br/>');
             isfile = true;
         } catch(err) {
-            text = '오류발생';
-            isfile = true;
+            text = '아직 파일이 없음';
         }
     }
     return {
