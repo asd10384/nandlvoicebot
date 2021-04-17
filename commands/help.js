@@ -18,7 +18,7 @@ module.exports = {
         var commandlist = config.commandhelp;
         var commandlist_name = Object.keys(commandlist);
         for (i in commandlist_name) {
-            text = `\` ${voice_prefix} ${commandlist_name[i]} \` : ${commandlist[commandlist_name[i]]}\n`;
+            text += `\` ${voice_prefix} ${commandlist_name[i]} \` : ${commandlist[commandlist_name[i]]}\n`;
         }
         const embed = new MessageEmbed()
             .setTitle(`명령어`)
@@ -26,6 +26,7 @@ module.exports = {
                 \` TEXT 명령어 \`
                 ${prefix}join : 봇을 음성에 불러옵니다.
                 ${prefix}leave : 봇을 음성에서 내보냅니다.
+                ${prefix}도움말 [명령어] : 도움말(명령어) 확인.
 
                 \` 음성 명령어 \`
                 ${text}
