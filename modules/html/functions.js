@@ -31,9 +31,14 @@ function logpage(now = './log', name = '') {
         }
         text += `</form>`;
     } catch(err) {
-        text = fs.readFileSync(url, 'utf-8');
-        text.replace(/\\n/g, '<br/>');
-        isfile = true;
+        try {
+            text = fs.readFileSync(url, 'utf-8');
+            text.replace(/\\n/g, '<br/>');
+            isfile = true;
+        } catch(err) {
+            text = '오류발생';
+            isfile = true;
+        }
     }
     return {
         text: text,
