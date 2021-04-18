@@ -24,7 +24,7 @@ function getFormatDate(date = new Date()) {
 }
 function getFormatTime(date = new Date()) {
     return `${
-        az(date.getHours()+addtime)
+        az(date.getHours()+Number(addtime))
     }:${
         az(date.getMinutes())
     }:${az(date.getSeconds())}`;
