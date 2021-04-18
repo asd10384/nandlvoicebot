@@ -38,28 +38,25 @@ function setInter(client, msg, guildMap, mapKey) {
 function logfile(client, text = '', user) {
     fs.access(`./log`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
-            fs.mkdir(`./log`, (err) => {
-                if (err) {}
-            });
-        } else {
-            var date = getFormatDate(new Date());
-            fs.access(`./log/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
-                if (err) {
-                    fs.mkdir(`./log/${date}`, (err) => {
-                        if (err) throw err;
-                    });
-                } else {
-                    fs.open(`./log/${date}/${user.id}.txt`, 'a+', (err, fd) => {
-                        if (err) throw err;
-                        var time = getFormatTime(new Date());
-                        fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
-                            if (err) throw err;
-                            client.channels.cache.get(config.text_channel).send(`[${time}] ${user.username} : ${text}`);
-                        });
-                    });
-                }
-            });
+            try {
+                fs.mkdirSync(`./log`);
+            } catch(err) {}
         }
+        var date = getFormatDate(new Date());
+        fs.access(`./log/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+            if (err) {
+                try {
+                    fs.mkdirSync(`./log/${date}`);
+                } catch(err) {}
+            }
+            fs.open(`./log/${date}/${user.id}.txt`, 'a+', (err, fd) => {
+                var time = getFormatTime(new Date());
+                fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
+                    if (err) throw err;
+                    client.channels.cache.get(config.text_channel).send(`[${time}] ${user.username} : ${text}`);
+                });
+            });
+        });
     });
 }
 

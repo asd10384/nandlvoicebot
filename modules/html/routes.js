@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const fs = require('fs');
-const fnc = require('./functions');
+const fnc = require('./funcs');
 
 // log
 router.get(`/`, (req, res) => {

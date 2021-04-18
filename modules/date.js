@@ -1,4 +1,7 @@
 
+const config = require('../config.json');
+const addtime = process.env.ADDTIME || config.addtime;
+
 module.exports = {
     inc,
     getFormatDate,
@@ -21,7 +24,7 @@ function getFormatDate(date = new Date()) {
 }
 function getFormatTime(date = new Date()) {
     return `${
-        az(date.getHours())
+        az(date.getHours()+addtime)
     }:${
         az(date.getMinutes())
     }:${az(date.getSeconds())}`;
