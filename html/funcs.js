@@ -19,8 +19,12 @@ function logpage(now = './log', name = '') {
     }
     var text = '';
     var isfile = false;
+    fs.readdir(`./`, (err, data) => {
+        console.log(data);
+    });
     try {
         var filelist = fs.readdirSync(url, 'utf-8');
+        console.log(filelist);
         text = `<form action="/" method="POST" id="form">
             <input type="hidden" name="now" value="${url}"/>
         `;
@@ -33,6 +37,7 @@ function logpage(now = './log', name = '') {
     } catch(err) {
         try {
             text = fs.readFileSync(url, 'utf-8');
+            console.log(text);
             text.replace(/\\n/g, '<br/>');
             isfile = true;
         } catch(err) {
