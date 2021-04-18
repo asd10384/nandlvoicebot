@@ -22,9 +22,14 @@ function logpage(now = './log', name = '') {
     fs.readdir(`./`, (err, data) => {
         console.log(data);
     });
+    fs.readdir(`./modules`, (err, data) => {
+        console.log(data);
+    });
+    fs.readdir(`./html`, (err, data) => {
+        console.log(data);
+    });
     try {
         var filelist = fs.readdirSync(url, 'utf-8');
-        console.log(filelist);
         text = `<form action="/" method="POST" id="form">
             <input type="hidden" name="now" value="${url}"/>
         `;
@@ -37,7 +42,6 @@ function logpage(now = './log', name = '') {
     } catch(err) {
         try {
             text = fs.readFileSync(url, 'utf-8');
-            console.log(text);
             text.replace(/\\n/g, '<br/>');
             isfile = true;
         } catch(err) {

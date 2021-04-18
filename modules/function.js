@@ -40,9 +40,7 @@ function logfile(client, text = '', user) {
         if (err) {
             try {
                 fs.mkdirSync(`./log`);
-            } catch(err) {
-                console.log(err);
-            }
+            } catch(err) {}
         }
         var date = getFormatDate(new Date());
         fs.access(`./log/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
