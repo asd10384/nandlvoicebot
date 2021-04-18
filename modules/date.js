@@ -16,15 +16,18 @@ function inc(args = [], text = '') {
 }
 
 function getFormatDate(date = new Date()) {
+    var addtime = (date.getHours()+Number(addtime) >= 24) ? 1 : 0;
     return `${
         date.getFullYear()
     }-${
         az(date.getMonth()+1)
-    }-${az(date.getDate())}`;
+    }-${az(date.getDate()+Number(addtime))}`;
 }
 function getFormatTime(date = new Date()) {
+    var hours = date.getHours()+Number(addtime);
+    if (hours >= 24) hours-24;
     return `${
-        az(date.getHours()+Number(addtime))
+        az(hours)
     }:${
         az(date.getMinutes())
     }:${az(date.getSeconds())}`;
