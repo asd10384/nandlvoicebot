@@ -1,7 +1,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const html = require('./modules/html/html');
+const html = require('./html/html');
 
 // CONFIG
 const config = require('./config.json');
@@ -32,7 +32,6 @@ client.on('ready', () => {
         },
         status: 'online'
     });
-    html.start();
 });
 client.login(DISCORD_TOKEN);
 
