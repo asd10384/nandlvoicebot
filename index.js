@@ -1,7 +1,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const html = require('./html/html');
 
 // CONFIG
 const config = require('./config.json');
