@@ -19,15 +19,6 @@ function logpage(now = './log', name = '') {
     }
     var text = '';
     var isfile = false;
-    fs.readdir(`./`, (err, data) => {
-        console.log(data);
-    });
-    fs.readdir(`./modules`, (err, data) => {
-        console.log(data);
-    });
-    fs.readdir(`./html`, (err, data) => {
-        console.log(data);
-    });
     try {
         var filelist = fs.readdirSync(url, 'utf-8');
         text = `<form action="/" method="POST" id="form">

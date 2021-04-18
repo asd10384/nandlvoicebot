@@ -16,5 +16,3 @@ node_modules/
 package-lock.json
 
 json.sqlite
-
-log/
