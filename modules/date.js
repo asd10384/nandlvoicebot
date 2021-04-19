@@ -25,7 +25,7 @@ function getFormatDate(date = new Date()) {
 }
 function getFormatTime(date = new Date()) {
     var hours = date.getHours()+Number(addtime);
-    if (hours >= 24) hours-24;
+    if (hours >= 24) hours = hours-24;
     return `${
         az(hours)
     }:${
