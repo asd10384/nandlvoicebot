@@ -17,5 +17,7 @@ package-lock.json
 
 json.sqlite
 
+.env
+
 googlesttapi.json
 googlettsapi.json
