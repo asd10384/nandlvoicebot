@@ -1,14 +1,18 @@
 
 require('dotenv').config();
+const STT = require('@google-cloud/speech');
+const sttclient = new STT.SpeechClient({
+    keyFile: 'googlesttapi.json'
+});
 const { MessageEmbed, Collection } = require('discord.js');
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const { Readable } = require('stream');
-const { tts_play } = require('../modules/tts');
-const { randm } = require('../modules/math');
-const { getFormatDate, getFormatTime } = require('../modules/date');
-const { say } = require('../modules/say');
+const { tts_play } = require('./tts');
+const { say } = require('./say');
+const { randm } = require('./math');
+const { getFormatDate, getFormatTime } = require('./date');
 
 const config = require('../config.json');
 const WITAPIKEY = process.env.WITAPIKEY || config.wit_ai_token;
@@ -25,11 +29,12 @@ module.exports = {
     setInter,
 };
 
-function setInter(client, msg, guildMap, mapKey) {
-    const setIntertimer = setInterval(() => {
+async function setInter(client, msg, guildMap, mapKey) {
+    const defult_voice_channel = process.env.defult_voice_channel || config.defult_voice_channel;
+    const setIntertimer = setInterval(async () => {
         if (!msg.guild.me.voice.channel) {
-            client.channels.cache.get(config.defult_voice_channel);
-            tts_play(msg, guildMap, mapKey, `빅스비는 내보낼수 없습니다.`, {});
+            client.channels.cache.get(defult_voice_channel);
+            await tts_play(msg, guildMap, mapKey, `빅스비는 내보낼수 없습니다.`, {});
             connect(client, msg, guildMap, mapKey, {
                 frist: false,
             });
@@ -37,6 +42,8 @@ function setInter(client, msg, guildMap, mapKey) {
     }, 1000);
 }
 function logfile(client, text = '', user) {
+    const text_channel = process.env.text_channel || config.text_channel;
+    if (text == undefined || text == null || text == '') return;
     fs.access(`./log`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             try {
@@ -54,7 +61,7 @@ function logfile(client, text = '', user) {
                 var time = getFormatTime(new Date());
                 fs.appendFile(`./log/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
                     if (err) throw err;
-                    client.channels.cache.get(config.text_channel).send(`[${time}] ${user.username} : ${text}`);
+                    client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
                 });
             });
         });
@@ -75,12 +82,12 @@ async function connect(client, msg, guildMap, mapKey, setting = {
     frist: true
 }) {
     try {
-        let voice_Channel = await client.channels.fetch(msg.member.voice.channelID);
+        let voice_Channel = await client.channels.fetch(msg.member.voice.channelID || process.env.defult_voice_channel || undefined);
         if (!voice_Channel) return msg.channel.send("음성채널에 들어갈수 없음");
-        let text_Channel = await client.channels.fetch(config.text_channel);
+        let text_Channel = await client.channels.fetch(process.env.text_channel || config.text_channel);
         if (!text_Channel) return msg.channel.send("텍스트채널을 볼수 없습니다.");
         let voice_Connection = await voice_Channel.join();
-        if (setting.frist) tts_play(msg, guildMap, mapKey, `빅스비가 활성화 되었습니다. 빅스비 명령어로 명령어들을 확인하실수있습니다.`, {});
+        if (setting.frist) await tts_play(msg, guildMap, mapKey, `빅스비가 활성화 되었습니다. 빅스비 명령어로 명령어들을 확인하실수있습니다.`, {});
         guildMap.set(mapKey, {
             'text_Channel': text_Channel,
             'voice_Channel': voice_Channel,
@@ -120,19 +127,19 @@ function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
 async function process_commands_query(client, msg, guildMap, mapKey, text, user) {
     if (!text || !text.length) return;
 
+    const voice_prefix = process.env.voice_prefix || config.voice_prefix;
+
+    // 빅스비야
     const saycheck = text.trim().split(/ +/g);
-    if (config.voice_prefix_say.includes(saycheck[0])) {
+    if ([`${voice_prefix}야`].includes(saycheck[0])) {
         const args = text.trim().slice(saycheck[0].length).trim().split(/ +/g);
-        return say(msg, guildMap, mapKey, args);
-    }
-    if (config.voice_prefix_say.includes(saycheck.slice(0,2).join(' '))) {
-        const args = text.trim().slice(saycheck.slice(0,2).join(' ').length).trim().split(/ +/g);
-        return say(msg, guildMap, mapKey, args);
+        return await say(msg, guildMap, mapKey, args);
     }
 
-    const regex = eval(`/^${config.voice_prefix} ([a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+)(.+?)?$/`);
+    // 빅스비
+    const regex = eval(`/^${voice_prefix} ([a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+)(.+?)?$/`);
     if (text.toLowerCase().match(regex)) {
-        const args = text.trim().slice(config.voice_prefix.length).trim().split(/ +/g);
+        const args = text.trim().slice(voice_prefix.length).trim().split(/ +/g);
 
         // 커맨드 불러오기
         client.commands = new Collection();
@@ -154,15 +161,34 @@ async function process_commands_query(client, msg, guildMap, mapKey, text, user)
                 2: '저는 잘 모르겠어요',
                 3: '처음들어보는 말이예요',
             };
-            return tts_play(msg, guildMap, mapKey, text[randm(1, 3)], {});
+            return await tts_play(msg, guildMap, mapKey, text[randm(1, 3)], {});
         }
     }
 }
 // SPEECH
 async function transcribe(client, buffer, user) {
-    return transcribe_witai(client, buffer, user);
+    // return transcribe_witai(client, buffer, user);
+    return transcribe_gspeech(client, buffer, user);
 }
 
+async function transcribe_gspeech(client, buffer, user) {
+    try {
+        const bytes = buffer.toString('base64');
+        const [response] = await sttclient.recognize({
+            audio: {content: bytes},
+            config: {
+                encoding: 'LINEAR16',
+                sampleRateHertz: 48000,
+                languageCode: 'ko-KR',
+            }
+        });
+        const transcription = response.results
+            .map(result => result.alternatives[0].transcript)
+            .join('\n');
+        logfile(client, transcription, user);
+        return transcription;
+    } catch(e) {}
+}
 async function transcribe_witai(client, buffer, user) {
     try {
         const extractSpeechIntent = util.promisify(witClient.extractSpeechIntent);
@@ -182,6 +208,7 @@ async function transcribe_witai(client, buffer, user) {
         return output;
     } catch (e) {}
 }
+
 async function convert_audio(input) {
     try {
         // stereo to mono channel

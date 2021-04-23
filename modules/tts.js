@@ -1,4 +1,11 @@
 
+require('dotenv').config();
+const TTS = require('@google-cloud/text-to-speech');
+const { writeFileSync } = require('fs');
+const ttsclient = new TTS.TextToSpeechClient({
+    keyFile: 'googlettsapi.json'
+});
+
 module.exports = {
     tts_msg,
     tts_play,
@@ -28,29 +35,44 @@ function tts_msg (text = '') {
 
     return text;
 }
-function tts_play(msg, guildMap, mapKey, text = '', opt = {
+async function tts_play(msg, guildMap, mapKey, text = '', opt = {
     customtext: false,
-    volume: 0
+    volume: 0.75
 }) {
-    var url = text;
     var options = {};
+    var url = '';
     if (!opt.customtext) {
-        url = `http://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=${
-            tts_msg(text)
-        }&tl=ko`;
+        const [response] = await ttsclient.synthesizeSpeech({
+            input: {text: tts_msg(text)},
+            voice: {
+                languageCode: 'ko-KR',
+                name: 'ko-KR-Standard-A'
+            },
+            audioConfig: {
+                audioEncoding: 'MP3', // 형식
+                speakingRate: 0.905, // 속도
+                pitch: 0, // 피치
+                // sampleRateHertz: 16000, // 헤르츠
+                // effectsProfileId: ['medium-bluetooth-speaker-class-device'] // 효과 https://cloud.google.com/text-to-speech/docs/audio-profiles
+            },
+        });
+        url = `tts.wav`;
+        writeFileSync(url, response.audioContent);
+    } else {
+        url = text;
     }
-    if (!opt.volume == 0) {
-        options = {
-            volume: opt.volume
-        };
-    }
+    options['volume'] = (opt.volume) ? opt.volume : 0.75;
+    return await ttsstart(msg, guildMap, mapKey, url, options);
+}
+
+async function ttsstart(msg, guildMap, mapKey, url, options) {
     var channel;
     try {
         channel = guildMap.get(mapKey).voice_Channel;
     } catch(err) {
         channel = msg.member.voice.channel;
     }
-    channel.join().then(connection => {
+    channel.join().then((connection) => {
         connection.play(url, options);
     });
 }

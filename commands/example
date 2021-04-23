@@ -1,7 +1,7 @@
 
 const { MessageEmbed, Message, Client } = require('discord.js');
 const config = require('../config.json');
-const { connect } = require('../modules/function');
+const { connect } = require('../modules/stt_function');
 
 module.exports = {
     name: '',

@@ -4,29 +4,31 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@discordjs/opus": "^0.4.0",
-    "@google-cloud/speech": "^4.2.0",
+    "@discordjs/opus": "^0.3.3",
+    "@google-cloud/speech": "^4.4.0",
+    "@google-cloud/text-to-speech": "^3.2.0",
     "@mapbox/node-pre-gyp": "^1.0.1",
+    "avconv": "^3.1.0",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "ffmpeg-static": "^4.2.7",
-    "get-youtube-id": "^1.0.1",
-    "node-spotify-api": "^1.1.1",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-static": "^4.3.0",
+    "fs": "*",
+    "http": "*",
+    "node-opus": "^0.3.3",
     "node-witai-speech": "^1.0.2",
+    "path": "^0.12.7",
     "request": "^2.88.2",
-    "underscore": "^1.12.0",
-    "youtube-info": "^1.3.2",
-    "youtube-playlist": "^1.0.4",
-    "yt-search": "^2.7.3",
-    "ytdl-core": "^4.5.0"
+    "simple-youtube-api": "^5.2.1",
+    "underscore": "^1.13.1",
+    "ytdl-core": "^3.2.2"
   },
-  "devDependencies": {},
   "scripts": {
-    ".": "node index.js; node html/html.js;"
+    ".": "node html/html.js && node index.js"
   },
   "engines": {
     "node": ">=12.10"

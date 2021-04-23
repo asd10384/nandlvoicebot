@@ -1,7 +1,7 @@
 
 const { MessageEmbed, Message, Client } = require('discord.js');
 const config = require('../config.json');
-const { connect } = require('../modules/function');
+const { connect } = require('../modules/stt_function');
 const { tts_play } = require('../modules/tts');
 const { randm } = require('../modules/math');
 
@@ -29,7 +29,7 @@ module.exports = {
             10: '안 반가우면서 거짓말 하지마세요'
         };
         
-        tts_play(msg, guildMap, mapKey, text[randm(1, 10)], {});
+        await tts_play(msg, guildMap, mapKey, text[randm(1, 10)], {});
     },
 };
 

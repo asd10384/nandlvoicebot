@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const { randm } = require('./math');
 const { inc } = require('./date');
 const { tts_play } = require('./tts');
@@ -7,7 +8,7 @@ module.exports = {
     say,
 };
 
-function say(msg, guildMap, mapKey, args = []) {
+async function say(msg, guildMap, mapKey, args = []) {
     var saytext = '';
     if (args[0] == '') {
         var text = {
@@ -29,5 +30,5 @@ function say(msg, guildMap, mapKey, args = []) {
     if (inc(['뭐야'], args[args.length-1])) {
         saytext = `내가 어떻게 알겠니?`;
     }
-    return tts_play(msg, guildMap, mapKey, saytext, {});
+    return await tts_play(msg, guildMap, mapKey, saytext, {});
 }

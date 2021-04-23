@@ -1,7 +1,7 @@
 
 const { MessageEmbed, Message, Client } = require('discord.js');
 const config = require('../config.json');
-const { connect, leave } = require('../modules/function');
+const { connect, leave } = require('../modules/stt_function');
 const { tts_play } = require('../modules/tts');
 const { randm } = require('../modules/math');
 
@@ -21,9 +21,9 @@ module.exports = {
         } catch(err) {
             channel = msg.member.voice.channel;
         }
-        tts_play(msg, guildMap, mapKey, `네 알겠습니다.`);
-        setTimeout(() => {
-            tts_play(msg, guildMap, mapKey, `sounds/boom.mp3`, {
+        await tts_play(msg, guildMap, mapKey, `네 알겠습니다.`);
+        setTimeout(async () => {
+            await tts_play(msg, guildMap, mapKey, `sounds/boom.mp3`, {
                 customtext: true,
                 volume: 0.5
             });

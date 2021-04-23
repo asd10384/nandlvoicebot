@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CONFIG
+const googleapi = require('./googleapi');
 const config = require('./config.json');
 const prefix = config.prefix;
 const DISCORD_TOKEN = process.env.TOKEN || config.discord_token;
@@ -32,6 +33,8 @@ client.on('ready', () => {
         },
         status: 'online'
     });
+    googleapi.getkeysttfile();
+    googleapi.getkeyttsfile();
 });
 client.login(DISCORD_TOKEN);
 

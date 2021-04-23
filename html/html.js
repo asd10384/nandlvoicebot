@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const config = require('../config.json');
 const http = require("http");
 const express = require('express');
@@ -12,7 +13,7 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/ejsfile');
 
 app.use(flash());
-app.use(bodyParser.urlencoded({extended : true})); 
+app.use(bodyParser.urlencoded({extended : true}));
 
 app.use(Route);
 app.use(express.static(__dirname + '/public'));

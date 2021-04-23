@@ -16,3 +16,6 @@ node_modules/
 package-lock.json
 
 json.sqlite
+
+googlesttapi.json
+googlettsapi.json
