@@ -22,5 +22,4 @@ app.listen(PORT, function() {
     setInterval(function () {
         http.get("http://bixbydiscordbot.herokuapp.com");
     }, 600000);
-    http.get("http://bixbydiscordbot.herokuapp.com");
 });
