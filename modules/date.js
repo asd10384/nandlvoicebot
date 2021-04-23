@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const config = require('../config.json');
 const addtime = process.env.ADDTIME || config.addtime;
 
