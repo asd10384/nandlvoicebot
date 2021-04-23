@@ -1,5 +1,6 @@
 
 const config = require('../config.json');
+const http = require("http");
 const express = require('express');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
@@ -18,4 +19,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.listen(PORT, function() {
     console.log('HTTP IS ONLINE PORT : ', PORT);
+    setInterval(function () {
+        http.get("http://bixbydiscordbot.herokuapp.com");
+    }, 600000);
 });
