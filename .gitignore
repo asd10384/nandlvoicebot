@@ -11,8 +11,6 @@
 # 동일 확장자인 파일 제외
 # *.파일확장자
 
-log/
-
 node_modules/
 
 package-lock.json
