@@ -28,7 +28,7 @@
     "ytdl-core": "^3.2.2"
   },
   "scripts": {
-    ".": "node html/html.js && node index.js"
+    "go": "start node index.js && start node html/html.js"
   },
   "engines": {
     "node": ">=12.10"
