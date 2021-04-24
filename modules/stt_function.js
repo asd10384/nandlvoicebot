@@ -45,6 +45,7 @@ function logfile(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
     var logfileurl = `${__dirname}/../log`;
+    console.log(__dirname, logfileurl);
     fs.access(logfileurl, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             try {
