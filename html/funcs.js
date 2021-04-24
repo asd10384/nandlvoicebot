@@ -7,7 +7,7 @@ module.exports = {
 
 function logpage(now = './modules/log', name = '') {
     var url = now;
-    console(now, '--', name)
+    console.log(now, '--', name)
     if (!name == '') {
         url += `/${name}`;
     }
