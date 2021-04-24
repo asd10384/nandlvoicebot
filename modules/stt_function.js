@@ -46,6 +46,7 @@ function logfile(client, text = '', user) {
     if (text == undefined || text == null || text == '') return;
     var logpath = __dirname.trim().split('\\');
     var logfileurl = `${logpath.slice(0,logpath.length-1).join('\\')}\\log`;
+    console.log(__dirname + '--' + logpath, '--', logfileurl);
     fs.access(logfileurl, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             try {
