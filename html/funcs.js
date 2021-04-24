@@ -13,7 +13,6 @@ function logpage(now = './log', name = '') {
     var day = '';
     var userid = '';
     var urllist = url.replace(/\.\/lo?(g\/|g)/g,'').split('/');
-    console.log(urllist);
     if (urllist.length == 2) {
         day = urllist[0];
         userid = urllist[1].replace(/\.txt/g,'');
@@ -22,6 +21,7 @@ function logpage(now = './log', name = '') {
     var isfile = false;
     try {
         var filelist = fs.readdirSync(url, 'utf-8');
+        console.log(filelist);
         text = `<form action="/" method="POST" id="form">
             <input type="hidden" name="now" value="${url}"/>
         `;
