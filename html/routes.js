@@ -9,7 +9,6 @@ const fnc = require('./funcs');
 // log
 router.get(`/`, (req, res) => {
     var text = fnc.logpage();
-    console.log(text);
     res.render(`log`, {
         now: `./log`,
         day: text.day,
@@ -19,7 +18,6 @@ router.get(`/`, (req, res) => {
     });
 });
 router.post(`/`, (req, res) => {
-    console.log(text);
     var now = req.body.now;
     var name = req.body.name;
     var text = fnc.logpage(now, name);
