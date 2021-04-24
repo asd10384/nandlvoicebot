@@ -10,7 +10,7 @@ const fnc = require('./funcs');
 router.get(`/`, (req, res) => {
     var text = fnc.logpage();
     res.render(`log`, {
-        now: `./log`,
+        now: `${__dirname}/log`,
         day: text.day,
         userid: text.userid,
         log: text.text,
