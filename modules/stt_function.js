@@ -23,7 +23,6 @@ module.exports = {
     connect,
     process_commands_query,
     speak_impl,
-    transcribe,
     transcribe_witai,
     leave,
     setInter,
@@ -44,10 +43,7 @@ async function setInter(client, msg, guildMap, mapKey) {
 function logfile(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
-    var pt = process.env.path;
-    var logpath = __dirname.trim().split(pt);
-    var logfileurl = `${logpath.slice(0,logpath.length-1).join(pt)}${pt}log`;
-    console.log(__dirname + '--' + logpath, '--', logfileurl);
+    var logfileurl = __dirname+`/log`;
     fs.access(logfileurl, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             try {
@@ -57,17 +53,17 @@ function logfile(client, text = '', user) {
             }
         }
         var date = getFormatDate(new Date());
-        fs.access(`${logfileurl}${pt}${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+        fs.access(`${logfileurl}/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
             if (err) {
                 try {
-                    fs.mkdirSync(`${logfileurl}${pt}${date}`);
+                    fs.mkdirSync(`${logfileurl}/${date}`);
                 } catch(err) {
                     console.log(err);
                 }
             }
-            fs.open(`${logfileurl}${pt}${date}${pt}${user.id}.txt`, 'a+', (err, fd) => {
+            fs.open(`${logfileurl}/${date}/${user.id}.txt`, 'a+', (err, fd) => {
                 var time = getFormatTime(new Date());
-                fs.appendFile(`${logfileurl}${pt}${date}${pt}${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
+                fs.appendFile(`${logfileurl}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
                     if (err) throw err;
                     client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
                 });
@@ -126,7 +122,7 @@ function speak_impl(client, msg, guildMap, voice_Connection, mapKey) {
 
             try {
                 let new_buffer = await convert_audio(buffer);
-                let out = await transcribe(client, new_buffer, user);
+                let out = await transcribe_gspeech(client, new_buffer, user);
                 if (out != null) process_commands_query(client, msg, guildMap, mapKey, out, user);
             } catch (e) {}
         });
@@ -174,11 +170,6 @@ async function process_commands_query(client, msg, guildMap, mapKey, text, user)
     }
 }
 // SPEECH
-async function transcribe(client, buffer, user) {
-    // return transcribe_witai(client, buffer, user);
-    return transcribe_gspeech(client, buffer, user);
-}
-
 async function transcribe_gspeech(client, buffer, user) {
     try {
         const bytes = buffer.toString('base64');
@@ -193,9 +184,12 @@ async function transcribe_gspeech(client, buffer, user) {
         const transcription = response.results
             .map(result => result.alternatives[0].transcript)
             .join('\n');
+        console.log(transcription);
         logfile(client, transcription, user);
         return transcription;
-    } catch(e) {}
+    } catch(e) {
+        console.log(e);
+    }
 }
 async function transcribe_witai(client, buffer, user) {
     try {

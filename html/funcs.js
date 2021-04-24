@@ -5,7 +5,7 @@ module.exports = {
     logpage,
 };
 
-function logpage(now = './log', name = '') {
+function logpage(now = './modules/log', name = '') {
     var url = now;
     if (!name == '') {
         url += `/${name}`;
