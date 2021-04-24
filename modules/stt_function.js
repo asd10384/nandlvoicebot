@@ -49,14 +49,18 @@ function logfile(client, text = '', user) {
         if (err) {
             try {
                 fs.mkdirSync(logfileurl);
-            } catch(err) {}
+            } catch(err) {
+                console.log(err);
+            }
         }
         var date = getFormatDate(new Date());
         fs.access(`${logfileurl}/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
             if (err) {
                 try {
                     fs.mkdirSync(`${logfileurl}/${date}`);
-                } catch(err) {}
+                } catch(err) {
+                    console.log(err);
+                }
             }
             fs.open(`${logfileurl}/${date}/${user.id}.txt`, 'a+', (err, fd) => {
                 var time = getFormatTime(new Date());
