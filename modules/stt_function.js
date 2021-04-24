@@ -44,8 +44,8 @@ async function setInter(client, msg, guildMap, mapKey) {
 function logfile(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
-    var logfileurl = `${__dirname}/../log`;
-    console.log(__dirname, logfileurl);
+    var logpath = __dirname.trim().split('\\');
+    var logfileurl = `${logpath.slice(0,logpath.length-1).join('\\')}\\log`;
     fs.access(logfileurl, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
         if (err) {
             try {
@@ -55,17 +55,17 @@ function logfile(client, text = '', user) {
             }
         }
         var date = getFormatDate(new Date());
-        fs.access(`${logfileurl}/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+        fs.access(`${logfileurl}\\${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
             if (err) {
                 try {
-                    fs.mkdirSync(`${logfileurl}/${date}`);
+                    fs.mkdirSync(`${logfileurl}\\${date}`);
                 } catch(err) {
                     console.log(err);
                 }
             }
-            fs.open(`${logfileurl}/${date}/${user.id}.txt`, 'a+', (err, fd) => {
+            fs.open(`${logfileurl}\\${date}\\${user.id}.txt`, 'a+', (err, fd) => {
                 var time = getFormatTime(new Date());
-                fs.appendFile(`${logfileurl}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
+                fs.appendFile(`${logfileurl}\\${date}\\${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
                     if (err) throw err;
                     client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
                 });
