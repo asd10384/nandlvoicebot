@@ -12,7 +12,7 @@ module.exports = {
 function write(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
-    var lc = `./log/log`;
+    var lc = __dirname + `/log`;
     var date = getFormatDate(new Date());
     var time = getFormatTime(new Date());
     mkdirp.sync(`${lc}/${date}`);
@@ -22,18 +22,18 @@ function write(client, text = '', user) {
     });
 }
 
-function load(now = './log/log', name = '') {
+function load(now = __dirname + '/log', name = '') {
+    console.log(__dirname);
     var url = now;
     if (!name == '') {
         url += `/${name}`;
     }
     var day = '';
     var userid = '';
-    var lc = (url.includes('\\')) ? '\\' : '/'
-    var urllist = url.replace(/\.\/lo?(g\/|g)/g,'').split(lc);
+    var urllist = url.replace(/\\/g,'/').split('/');
     if (urllist.length > 2) {
-        day = urllist[1];
-        userid = urllist[2].replace(/\.txt/g,'');
+        day = urllist[urllist.length-2];
+        userid = urllist[urllist.length-1].replace(/\.txt/g,'');
     }
     var text = '';
     var isfile = false;
