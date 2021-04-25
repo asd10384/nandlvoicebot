@@ -155,7 +155,7 @@ async function transcribe_gspeech(client, buffer, user) {
             .map(result => result.alternatives[0].transcript)
             .join('\n');
         // console.log(transcription);
-        log.write(client, transcription, user);
+        await log.write(client, transcription, user);
         return transcription;
     } catch(e) {
         console.log(e);
@@ -170,11 +170,11 @@ async function transcribe_witai(client, buffer, user) {
         witAI_lastcallTS = Math.floor(new Date());
         stream.destroy();
         if (output && '_text' in output && output._text.length) {
-            log.write(client, output._text, user);
+            await log.write(client, output._text, user);
             return output._text;
         }
         if (output && 'text' in output && output.text.length) {
-            log.write(client, output.text, user);
+            await log.write(client, output.text, user);
             return output.text;
         }
         return output;

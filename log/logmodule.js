@@ -9,23 +9,20 @@ module.exports = {
     load,
 };
 
-function write(client, text = '', user) {
+async function write(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
     var lc = `log/log`;
     var date = getFormatDate(new Date());
     var time = getFormatTime(new Date());
-    mkdirp.sync(`${lc}/${date}`);
-    fs.writeFile(`${lc}/${date}/${user.id}_2.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, (err) => {
-        if (err) throw err;
-    });
-    fs.appendFile(`${lc}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
+    await mkdirp.sync(`${lc}/${date}`);
+    await fs.appendFile(`${lc}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
         if (err) throw err;
         client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
     });
 }
 
-function load(now = 'log/log', name = '') {
+async function load(now = 'log/log', name = '') {
     var url = now;
     if (!name == '') {
         url += `/${name}`;
@@ -40,7 +37,7 @@ function load(now = 'log/log', name = '') {
     var text = '';
     var isfile = false;
     try {
-        var filelist = fs.readdirSync(url, 'utf-8');
+        var filelist = await fs.readdirSync(url, 'utf-8');
         text = `<form action="/" method="POST" id="form">
             <input type="hidden" name="now" value="${url}"/>
         `;
@@ -52,7 +49,7 @@ function load(now = 'log/log', name = '') {
         text += `</form>`;
     } catch(err) {
         try {
-            text = fs.readFileSync(url, 'utf-8');
+            text = await fs.readFileSync(url, 'utf-8');
             text.replace(/\\n/g, '<br/>');
             isfile = true;
         } catch(err) {

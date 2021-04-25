@@ -7,8 +7,8 @@ const fs = require('fs');
 const log = require('../log/logmodule');
 
 // log
-router.get(`/`, (req, res) => {
-    var text = log.load();
+router.get(`/`, async (req, res) => {
+    var text = await log.load();
     res.render(`log`, {
         now: `log`,
         day: text.day,
@@ -17,10 +17,10 @@ router.get(`/`, (req, res) => {
         isfile: text.isfile
     });
 });
-router.post(`/`, (req, res) => {
+router.post(`/`, async (req, res) => {
     var now = req.body.now;
     var name = req.body.name;
-    var text = log.load(now, name);
+    var text = await log.load(now, name);
     res.render(`log`, {
         now: `${now}/${name}`,
         day: text.day,
