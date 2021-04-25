@@ -16,7 +16,7 @@ function write(client, text = '', user) {
     var date = getFormatDate(new Date());
     var time = getFormatTime(new Date());
     mkdirp.sync(`${lc}/${date}`);
-    fs.writeFile(`${lc}/${date}/${user.id}_2.txt``[${time}] ${user.username} : ${text} <br/>\n`, (err) => {
+    fs.writeFile(`${lc}/${date}/${user.id}_2.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, (err) => {
         if (err) throw err;
     });
     fs.appendFile(`${lc}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
