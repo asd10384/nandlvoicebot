@@ -10,11 +10,12 @@ module.exports = {
 };
 
 async function write(client, text = '', user) {
+    var date = getFormatDate(new Date());
+    var time = getFormatTime(new Date());
+    return client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
     var lc = `log/log`;
-    var date = getFormatDate(new Date());
-    var time = getFormatTime(new Date());
     await mkdirp.sync(`${lc}/${date}`);
     await fs.appendFile(`${lc}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
         if (err) throw err;
