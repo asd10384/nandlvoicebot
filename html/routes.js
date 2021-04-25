@@ -4,11 +4,11 @@ const express = require('express');
 const router = express.Router();
 
 const fs = require('fs');
-const fnc = require('./funcs');
+const log = require('../log/logmodule');
 
 // log
 router.get(`/`, (req, res) => {
-    var text = fnc.logpage();
+    var text = log.load();
     res.render(`log`, {
         now: `${__dirname}/log`,
         day: text.day,
@@ -20,7 +20,7 @@ router.get(`/`, (req, res) => {
 router.post(`/`, (req, res) => {
     var now = req.body.now;
     var name = req.body.name;
-    var text = fnc.logpage(now, name);
+    var text = log.load(now, name);
     res.render(`log`, {
         now: `${now}/${name}`,
         day: text.day,

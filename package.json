@@ -19,6 +19,7 @@
     "ffmpeg-static": "^4.3.0",
     "fs": "*",
     "http": "*",
+    "mkdirp": "^0.5.5",
     "node-opus": "^0.3.3",
     "node-witai-speech": "^1.0.2",
     "path": "^0.12.7",

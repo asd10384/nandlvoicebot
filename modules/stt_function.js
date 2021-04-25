@@ -13,6 +13,7 @@ const { tts_play } = require('./tts');
 const { say } = require('./say');
 const { randm } = require('./math');
 const { getFormatDate, getFormatTime } = require('./date');
+const log = require('../log/logmodule');
 
 const config = require('../config.json');
 const WITAPIKEY = process.env.WITAPIKEY || config.wit_ai_token;
@@ -39,37 +40,6 @@ async function setInter(client, msg, guildMap, mapKey) {
             });
         }
     }, 1000);
-}
-function logfile(client, text = '', user) {
-    const text_channel = process.env.text_channel || config.text_channel;
-    if (text == undefined || text == null || text == '') return;
-    var logfileurl = __dirname+`/log`;
-    fs.access(logfileurl, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
-        if (err) {
-            try {
-                fs.mkdirSync(logfileurl);
-            } catch(err) {
-                console.log(err);
-            }
-        }
-        var date = getFormatDate(new Date());
-        fs.access(`${logfileurl}/${date}`, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
-            if (err) {
-                try {
-                    fs.mkdirSync(`${logfileurl}/${date}`);
-                } catch(err) {
-                    console.log(err);
-                }
-            }
-            fs.open(`${logfileurl}/${date}/${user.id}.txt`, 'a+', (err, fd) => {
-                var time = getFormatTime(new Date());
-                fs.appendFile(`${logfileurl}/${date}/${user.id}.txt`, `[${time}] ${user.username} : ${text} <br/>\n`, function (err) {
-                    if (err) throw err;
-                    client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
-                });
-            });
-        });
-    });
 }
 
 async function leave(guildMap, mapKey) {
@@ -184,8 +154,8 @@ async function transcribe_gspeech(client, buffer, user) {
         const transcription = response.results
             .map(result => result.alternatives[0].transcript)
             .join('\n');
-        console.log(transcription);
-        logfile(client, transcription, user);
+        // console.log(transcription);
+        log.write(client, transcription, user);
         return transcription;
     } catch(e) {
         console.log(e);
@@ -200,11 +170,11 @@ async function transcribe_witai(client, buffer, user) {
         witAI_lastcallTS = Math.floor(new Date());
         stream.destroy();
         if (output && '_text' in output && output._text.length) {
-            logfile(client, output._text, user);
+            log.write(client, output._text, user);
             return output._text;
         }
         if (output && 'text' in output && output.text.length) {
-            logfile(client, output.text, user);
+            log.write(client, output.text, user);
             return output.text;
         }
         return output;
