@@ -12,7 +12,7 @@ module.exports = {
 function write(client, text = '', user) {
     const text_channel = process.env.text_channel || config.text_channel;
     if (text == undefined || text == null || text == '') return;
-    var lc = __dirname + `/log`;
+    var lc = `log/log`;
     var date = getFormatDate(new Date());
     var time = getFormatTime(new Date());
     mkdirp.sync(`${lc}/${date}`);
@@ -22,8 +22,7 @@ function write(client, text = '', user) {
     });
 }
 
-function load(now = __dirname + '/log', name = '') {
-    console.log(__dirname);
+function load(now = 'log/log', name = '') {
     var url = now;
     if (!name == '') {
         url += `/${name}`;

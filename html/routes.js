@@ -10,7 +10,7 @@ const log = require('../log/logmodule');
 router.get(`/`, (req, res) => {
     var text = log.load();
     res.render(`log`, {
-        now: `${__dirname}/log`,
+        now: `log`,
         day: text.day,
         userid: text.userid,
         log: text.text,
