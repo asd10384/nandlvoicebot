@@ -12,8 +12,8 @@ module.exports = {
 async function write(client, text = '', user) {
     var date = getFormatDate(new Date());
     var time = getFormatTime(new Date());
-    return client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
     const text_channel = process.env.text_channel || config.text_channel;
+    return client.channels.cache.get(text_channel).send(`[${time}] ${user.username} : ${text}`);
     if (text == undefined || text == null || text == '') return;
     var lc = `log/log`;
     await mkdirp.sync(`${lc}/${date}`);
